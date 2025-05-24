@@ -1,0 +1,231 @@
+
+/* Global Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+}
+
+.bg-primary {
+    background-color: #4e73df !important;
+}
+
+.btn-primary {
+    background-color: #4e73df;
+    border-color: #4e73df;
+}
+
+.btn-primary:hover {
+    background-color: #2e59d9;
+    border-color: #2e59d9;
+}
+
+.text-primary {
+    color: #4e73df !important;
+}
+
+/* Header & Navigation */
+.navbar {
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.3rem;
+}
+
+/* Hero Section */
+.hero {
+    padding: 6rem 0;
+    background: linear-gradient(to right, rgba(78, 115, 223, 0.1), rgba(78, 115, 223, 0.05));
+}
+
+/* Card Styles */
+.card {
+    border: none;
+    border-radius: 0.35rem;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+}
+
+.card-header {
+    background-color: #f8f9fc;
+    border-bottom: 1px solid #e3e6f0;
+}
+
+/* Product Cards */
+.card-img-top {
+    border-top-left-radius: 0.35rem;
+    border-top-right-radius: 0.35rem;
+}
+
+/* Star Rating */
+.star-rating {
+    display: inline-flex;
+    flex-direction: row-reverse;
+    font-size: 1.5rem;
+    justify-content: flex-end;
+    padding: 0 0.2em;
+    text-align: center;
+    width: 5em;
+}
+
+.star-rating input {
+    display: none;
+}
+
+.star-rating label {
+    color: #ccc;
+    cursor: pointer;
+    padding: 0 0.1em;
+    transition: color 0.3s;
+}
+
+.star-rating label:hover,
+.star-rating label:hover ~ label,
+.star-rating input:checked ~ label {
+    color: #f8ce0b;
+}
+
+/* Custom Page Content */
+.custom-page-content img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Footer */
+footer {
+    margin-top: 2rem;
+}
+
+footer a {
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+/* Dashboard */
+.dashboard-stats .card {
+    border-left: 0.25rem solid;
+    border-radius: 0.35rem;
+}
+
+.dashboard-stats .card-primary {
+    border-left-color: #4e73df;
+}
+
+.dashboard-stats .card-success {
+    border-left-color: #1cc88a;
+}
+
+.dashboard-stats .card-info {
+    border-left-color: #36b9cc;
+}
+
+.dashboard-stats .card-warning {
+    border-left-color: #f6c23e;
+}
+
+/* Cart Quantity Input */
+.cart-quantity {
+    width: 80px;
+}
+
+/* Product Image Upload */
+.image-upload-container {
+    border: 2px dashed #ddd;
+    border-radius: 0.35rem;
+    padding: 2rem;
+    text-align: center;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.image-upload-container:hover {
+    border-color: #4e73df;
+}
+
+.image-preview-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.image-preview {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    border-radius: 0.35rem;
+    overflow: hidden;
+}
+
+.image-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.image-preview .remove-image {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+/* Shop Frontend Customization */
+.shop-banner {
+    height: 300px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.shop-banner-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    color: white;
+}
+
+.shop-logo {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid white;
+    object-fit: cover;
+    margin-bottom: 1rem;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+    .hero {
+        padding: 3rem 0;
+    }
+    
+    .shop-banner {
+        height: 200px;
+    }
+    
+    .shop-logo {
+        width: 80px;
+        height: 80px;
+    }
+}
+
+

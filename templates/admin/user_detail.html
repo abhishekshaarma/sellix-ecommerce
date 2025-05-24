@@ -1,0 +1,38 @@
+{% extends 'store_base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>User: {{ user.username }}</h2>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p><strong>Joined:</strong> {{ user.created_at }}</p>
+    <p><strong>Is Admin:</strong> {{ 'Yes' if user.is_admin else 'No' }}</p>
+
+    {% if seller %}
+        <p><strong>Seller:</strong> <a href="{{ url_for('admin.seller_detail', seller_id=seller.id) }}">View Seller Profile</a></p>
+    {% endif %}
+
+    <form method="POST" action="{{ url_for('admin.toggle_admin', user_id=user.id) }}">
+        <button class="btn btn-warning mt-2">
+            {% if user.is_admin %}Remove Admin{% else %}Make Admin{% endif %}
+        </button>
+    </form>
+
+    <hr>
+    <h4>Orders</h4>
+    <table class="table">
+        <thead>
+            <tr><th>ID</th><th>Total</th><th>Status</th><th>Date</th></tr>
+        </thead>
+        <tbody>
+        {% for order in orders %}
+            <tr>
+                <td><a href="{{ url_for('admin.order_detail', order_id=order.id) }}">#{{ order.id }}</a></td>
+                <td>${{ order.total_amount }}</td>
+                <td>{{ order.status }}</td>
+                <td>{{ order.created_at }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

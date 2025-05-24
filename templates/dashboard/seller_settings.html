@@ -1,0 +1,36 @@
+{% extends 'store_base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Seller Settings</h2>
+
+    <form method="POST" action="{{ url_for('seller.update_settings') }}">
+        <div class="form-group">
+            <label for="shop_name">Shop Name</label>
+            <input type="text" class="form-control" name="shop_name" value="{{ seller.shop_name }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="shop_description">Shop Description</label>
+            <textarea class="form-control" name="shop_description" rows="3">{{ seller.shop_description }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="logo_url">Logo URL</label>
+            <input type="text" class="form-control" name="logo_url" value="{{ seller.logo_url }}">
+        </div>
+
+        <div class="form-group">
+            <label for="banner_url">Banner URL</label>
+            <input type="text" class="form-control" name="banner_url" value="{{ seller.banner_url }}">
+        </div>
+
+        <div class="form-group">
+            <label for="theme_color">Theme Color</label>
+            <input type="color" class="form-control" name="theme_color" value="{{ seller.theme_color }}">
+        </div>
+
+        <button type="submit" class="btn btn-success mt-2">Save Settings</button>
+    </form>
+</div>
+{% endblock %}

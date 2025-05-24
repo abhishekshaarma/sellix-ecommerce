@@ -1,0 +1,33 @@
+
+{% extends 'store_base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Seller: {{ seller.shop_name }}</h2>
+    <p><strong>Description:</strong> {{ seller.shop_description }}</p>
+    <p><strong>Verified:</strong> {{ 'Yes' if seller.is_verified else 'No' }}</p>
+    <p><strong>User:</strong> {{ user.username }} ({{ user.email }})</p>
+
+    <form method="POST" action="{{ url_for('admin.toggle_verified', seller_id=seller.id) }}">
+        <button class="btn btn-warning mt-2">
+            {% if seller.is_verified %}Unverify Seller{% else %}Verify Seller{% endif %}
+        </button>
+    </form>
+
+    <hr>
+    <h4>Products</h4>
+    <ul>
+    {% for product in products %}
+        <li><a href="{{ url_for('admin.product_detail', product_id=product.id) }}">{{ product.name }}</a></li>
+    {% endfor %}
+    </ul>
+
+    <hr>
+    <h4>Orders</h4>
+    <ul>
+    {% for order in orders %}
+        <li><a href="{{ url_for('admin.order_detail', order_id=order.id) }}">Order #{{ order.id }}</a></li>
+    {% endfor %}
+    </ul>
+</div>
+{% endblock %}

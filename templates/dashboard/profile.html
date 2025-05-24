@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-3">
+            <!-- Profile Sidebar -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>Dashboard</h4>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{{ url_for('auth.profile') }}" class="list-group-item list-group-item-action active">My Profile</a>
+                    {% if is_seller %}
+                        <a href="{{ url_for('seller.dashboard') }}" class="list-group-item list-group-item-action">Seller Dashboard</a>
+                        <a href="{{ url_for('seller.products') }}" class="list-group-item list-group-item-action">My Products</a>
+                        <a href="{{ url_for('seller.orders') }}" class="list-group-item list-group-item-action">Orders</a>
+                    {% else %}
+                        <a href="{{ url_for('auth.become_seller') }}" class="list-group-item list-group-item-action">Become a Seller</a>
+                    {% endif %}
+                    <a href="{{ url_for('admin.orders') }}" class="list-group-item list-group-item-action">My Orders</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-9">
+            <!-- Profile Information -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4>Profile Information</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('auth.update_profile') }}">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="username" class="form-label">Username</label>
+                                <input type="text" class="form-control" id="username" value="{{ user.username }}" readonly>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" value="{{ user.email or '' }}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="first_name" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name or '' }}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="last_name" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user.last_name or '' }}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label">Phone</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" value="{{ user.phone or '' }}">
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label for="address" class="form-label">Address</label>
+                                <textarea class="form-control" id="address" name="address" rows="3">{{ user.address or '' }}</textarea>
+                            </div>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Update Profile</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Change Password -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>Change Password</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('auth.change_password') }}">
+                        <div class="mb-3">
+                            <label for="current_password" class="form-label">Current Password</label>
+                            <input type="password" class="form-control" id="current_password" name="current_password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="new_password" class="form-label">New Password</label>
+                            <input type="password" class="form-control" id="new_password" name="new_password" required>
+                            <small class="form-text text-muted">Password must be at least 6 characters long.</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirm_password" class="form-label">Confirm New Password</label>
+                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Change Password</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Seller Information (if applicable) -->
+            {% if is_seller %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>Seller Information</h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Shop Name</label>
+                        <p class="form-control-static">{{ seller.shop_name }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Shop Description</label>
+                        <p class="form-control-static">{{ seller.shop_description or 'No description available' }}</p>
+                    </div>
+                    <div class="d-grid">
+                        <a href="{{ url_for('seller.dashboard') }}" class="btn btn-primary">Go to Seller Dashboard</a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

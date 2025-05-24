@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('seller.dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('seller.products') }}">Products</a></li>
+                    <li class="breadcrumb-item active">{% if product %}Edit{% else %}Add{% endif %} Product</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">{% if product %}Edit{% else %}Add{% endif %} Product</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="name" class="form-label">Product Name</label>
+                                <input type="text" class="form-control" id="name" name="name" value="{{ product.name if product else '' }}" required>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="category_id" class="form-label">Category</label>
+                                <select class="form-select" id="category_id" name="category_id">
+                                    <option value="">Select Category</option>
+                                    {% for category in categories %}
+                                    <option value="{{ category.id }}" {% if product and product.category_id == category.id %}selected{% endif %}>
+                                        {{ category.name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="price" class="form-label">Price</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control" id="price" name="price" step="0.01" value="{{ product.price if product else '' }}" required>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="discount_price" class="form-label">Discount Price (Optional)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control" id="discount_price" name="discount_price" step="0.01" value="{{ product.discount_price if product and product.discount_price else '' }}">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="5">{{ product.description if product else '' }}</textarea>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="stock_quantity" class="form-label">Stock Quantity</label>
+                                <input type="number" class="form-control" id="stock_quantity" name="stock_quantity" value="{{ product.stock_quantity if product else '0' }}">
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label for="barcode" class="form-label">Barcode (Optional)</label>
+                                <input type="text" class="form-control" id="barcode" name="barcode" value="{{ product.barcode if product else '' }}">
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label for="sku" class="form-label">SKU (Optional)</label>
+                                <input type="text" class="form-control" id="sku" name="sku" value="{{ product.sku if product else '' }}">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Product Images</label>
+                            <div class="image-upload-container" id="image-upload-container">
+                                <input type="file" id="product-images" multiple accept="image/*" class="d-none">
+                                <div class="text-center">
+                                    <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                                    <p class="mb-0">Drag & drop images here or click to upload</p>
+                                    <p class="text-muted"><small>Upload up to 5 images (PNG, JPG, JPEG)</small></p>
+                                </div>
+                            </div>
+                            <div class="image-preview-container" id="image-preview-container">
+                                {% if product and product.images %}
+                                {% for image in product.images %}
+                                <div class="image-preview">
+                                    <img src="{{ image.image_url }}" alt="Preview">
+                                    <span class="remove-image" data-index="{{ loop.index0 }}"><i class="fas fa-times"></i></span>
+                                </div>
+                                {% endfor %}
+                                {% endif %}
+                            </div>
+                            <input type="hidden" id="uploaded-images" name="images" value="{{ product.images|tojson if product and product.images else '[]' }}">
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="is_active" name="is_active" {% if not product or product.is_active %}checked{% endif %}>
+                            <label class="form-check-label" for="is_active">Active (visible in store)</label>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('seller.products') }}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Save Product</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const uploadContainer = document.getElementById('image-upload-container');
+        const fileInput = document.getElementById('product-images');
+        const previewContainer = document.getElementById('image-preview-container');
+        const uploadedImagesInput = document.getElementById('uploaded-images');
+        
+        uploadContainer.addEventListener('click', function() {
+            fileInput.click();
+        });
+        
+        // Handle drag and drop
+        uploadContainer.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            uploadContainer.classList.add('border-primary');
+        });
+        
+        uploadContainer.addEventListener('dragleave', function() {
+            uploadContainer.classList.remove('border-primary');
+        });
+        
+        uploadContainer.addEventListener('drop', function(e) {
+            e.preventDefault();
+            uploadContainer.classList.remove('border-primary');
+            
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                handleFiles(e.dataTransfer.files);
+            }
+        });
+        
+        fileInput.addEventListener('change', function() {
+            handleFiles(this.files);
+        });
+        
+        // Handle file selection
+        function handleFiles(files) {
+            if (files.length > 5) {
+                alert('You can upload a maximum of 5 images');
+                return;
+            }
+            
+            for (let i = 0; i < files.length; i++) {
+                uploadFile(files[i]);
+            }
+        }
+        
+        // Upload file and show preview
+        function uploadFile(file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                // Create preview
+                const preview = document.createElement('div');
+                preview.className = 'image-preview';
+                preview.innerHTML = `
+                    <img src="${e.target.result}" alt="Preview">
+                    <div class="spinner-border spinner-border-sm position-absolute" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                `;
+                
+                previewContainer.appendChild(preview);
+                
+                // Upload to server
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.url) {
+                        // Update preview with server URL
+                        preview.innerHTML = `
+                            <img src="${data.url}" alt="Preview">
+                            <span class="remove-image"><i class="fas fa-times"></i></span>
+                        `;
+                        
+                        // Add to uploaded images
+                        let images = JSON.parse(uploadedImagesInput.value || '[]');
+                        images.push(data.url);
+                        uploadedImagesInput.value = JSON.stringify(images);
+                        
+                        // Add remove event listener
+                        const removeBtn = preview.querySelector('.remove-image');
+                        removeBtn.addEventListener('click', function() {
+                            const index = Array.from(previewContainer.children).indexOf(preview);
+                            images = JSON.parse(uploadedImagesInput.value || '[]');
+                            images.splice(index, 1);
+                            uploadedImagesInput.value = JSON.stringify(images);
+                            preview.remove();
+                        });
+                    } else {
+                        preview.innerHTML = `
+                            <div class="text-danger">Upload failed</div>
+                        `;
+                        setTimeout(() => preview.remove(), 3000);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error uploading file:', error);
+                    preview.innerHTML = `
+                        <div class="text-danger">Upload failed</div>
+                    `;
+                    setTimeout(() => preview.remove(), 3000);
+                });
+            };
+            
+            reader.readAsDataURL(file);
+        }
+        
+        // Handle existing remove buttons
+        document.querySelectorAll('.remove-image').forEach(button => {
+            button.addEventListener('click', function() {
+                const index = parseInt(this.dataset.index);
+                const preview = this.closest('.image-preview');
+                
+                let images = JSON.parse(uploadedImagesInput.value || '[]');
+                images.splice(index, 1);
+                uploadedImagesInput.value = JSON.stringify(images);
+                
+                preview.remove();
+            });
+        });
+    });
+</script>
+{% endblock %}

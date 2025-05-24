@@ -1,0 +1,142 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">Manage Products</h1>
+        <a href="{{ url_for('seller.add_product') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add New Product
+        </a>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Products</h6>
+        </div>
+        <div class="card-body">
+            {% if products %}
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="productsTable" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Stock</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in products %}
+                                <tr>
+                                    <td class="text-center">
+                                        {% if product.image_url %}
+                                            <img src="{{ product.image_url }}" alt="{{ product.name }}" class="product-thumbnail" width="50">
+                                        {% else %}
+                                            <div class="no-image-placeholder">No Image</div>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ product.name }}</td>
+                                    <td>{{ product.category_name if product.category_name else "Uncategorized" }}</td>
+                                    <td>
+                                        {% if product.discount_price %}
+                                            <span class="text-decoration-line-through text-muted">${{ product.price }}</span>
+                                            <span class="text-success">${{ product.discount_price }}</span>
+                                        {% else %}
+                                            ${{ product.price }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if product.stock_quantity <= 0 %}
+                                            <span class="badge bg-danger">Out of Stock</span>
+                                        {% elif product.stock_quantity < 10 %}
+                                            <span class="badge bg-warning text-dark">Low Stock ({{ product.stock_quantity }})</span>
+                                        {% else %}
+                                            <span class="badge bg-success">{{ product.stock_quantity }} in Stock</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if product.is_active %}
+                                            <span class="badge bg-success">Active</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Inactive</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ url_for('seller.edit_product', product_id=product.id) }}" class="btn btn-sm btn-primary">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{{ url_for('seller.product_detail', product_id=product.id) }}" class="btn btn-sm btn-info">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ product.id }}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+
+                                        <!-- Delete Modal -->
+                                        <div class="modal fade" id="deleteModal{{ product.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ product.id }}" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="deleteModalLabel{{ product.id }}">Confirm Delete</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        Are you sure you want to delete <strong>{{ product.name }}</strong>? This action cannot be undone.
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                        <form action="{{ url_for('seller.delete_product', product_id=product.id) }}" method="POST">
+                                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-box-open fa-4x mb-3 text-muted"></i>
+                    <h5>You don't have any products yet</h5>
+                    <p class="text-muted">Start selling by adding your first product.</p>
+                    <a href="{{ url_for('seller.add_product') }}" class="btn btn-primary mt-3">
+                        <i class="fas fa-plus"></i> Add New Product
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% if products %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        $('#productsTable').DataTable({
+            order: [[1, 'asc']],
+            pageLength: 25,
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]]
+        });
+    });
+</script>
+{% endif %}
+{% endblock %}

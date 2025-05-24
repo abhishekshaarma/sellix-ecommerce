@@ -1,0 +1,237 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        {% if seller.logo_url %}
+                        <img src="{{ seller.logo_url }}" alt="{{ seller.shop_name }}" class="rounded-circle me-3" style="width: 70px; height: 70px; object-fit: cover;">
+                        {% else %}
+                        <div class="bg-primary rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 70px; height: 70px;">
+                            <i class="fas fa-store fa-2x text-white"></i>
+                        </div>
+                        {% endif %}
+                        <div>
+                            <h2 class="mb-0">{{ seller.shop_name }}</h2>
+                            {% if seller.is_verified %}
+                            <span class="badge bg-success">Verified Seller</span>
+                            {% endif %}
+                            <p class="text-muted mb-0">Member since {{ seller.created_at.strftime('%B %d, %Y') }}</p>
+                        </div>
+                        <div class="ms-auto">
+                            <a href="{{ url_for('seller.settings') }}" class="btn btn-outline-primary">
+                                <i class="fas fa-cog me-1"></i> Shop Settings
+                            </a>
+                            <a href="{{ url_for('seller.shop_home', seller_id=seller.id) }}" class="btn btn-primary ms-2">
+                                <i class="fas fa-eye me-1"></i> View My Shop
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Dashboard Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-white p-3 me-3">
+                            <i class="fas fa-box fa-2x text-primary"></i>
+                        </div>
+                        <div>
+                            <h3 class="mb-0">{{ product_count }}</h3>
+                            <p class="mb-0">Products</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="{{ url_for('seller.products') }}" class="text-white d-flex align-items-center">
+                        Manage Products <i class="fas fa-arrow-right ms-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-white p-3 me-3">
+                            <i class="fas fa-shopping-cart fa-2x text-success"></i>
+                        </div>
+                        <div>
+                            <h3 class="mb-0">{{ order_count }}</h3>
+                            <p class="mb-0">Orders</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="{{ url_for('seller.orders') }}" class="text-white d-flex align-items-center">
+                        Manage Orders <i class="fas fa-arrow-right ms-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card bg-info text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-white p-3 me-3">
+                            <i class="fas fa-dollar-sign fa-2x text-info"></i>
+                        </div>
+                        <div>
+                            <h3 class="mb-0">${{ "%.2f"|format(total_sales) }}</h3>
+                            <p class="mb-0">Total Sales</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="{{ url_for('seller.orders') }}" class="text-white d-flex align-items-center">
+                        View Sales <i class="fas fa-arrow-right ms-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card bg-warning text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-white p-3 me-3">
+                            <i class="fas fa-file-alt fa-2x text-warning"></i>
+                        </div>
+                        <div>
+                            <h3 class="mb-0">Custom</h3>
+                            <p class="mb-0">Pages</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="{{ url_for('seller.pages') }}" class="text-white d-flex align-items-center">
+                        Manage Pages <i class="fas fa-arrow-right ms-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 text-center mb-3 mb-md-0">
+                            <a href="{{ url_for('seller.add_product') }}" class="btn btn-outline-primary btn-lg d-flex flex-column align-items-center py-3">
+                                <i class="fas fa-plus-circle fa-2x mb-2"></i>
+                                <span>Add New Product</span>
+                            </a>
+                        </div>
+                        <div class="col-md-3 text-center mb-3 mb-md-0">
+                            <a href="{{ url_for('seller.products') }}" class="btn btn-outline-primary btn-lg d-flex flex-column align-items-center py-3">
+                                <i class="fas fa-edit fa-2x mb-2"></i>
+                                <span>Update Inventory</span>
+                            </a>
+                        </div>
+                        <div class="col-md-3 text-center mb-3 mb-md-0">
+                            <a href="{{ url_for('seller.add_page') }}" class="btn btn-outline-primary btn-lg d-flex flex-column align-items-center py-3">
+                                <i class="fas fa-file-alt fa-2x mb-2"></i>
+                                <span>Create New Page</span>
+                            </a>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <a href="{{ url_for('seller.settings') }}" class="btn btn-outline-primary btn-lg d-flex flex-column align-items-center py-3">
+                                <i class="fas fa-cog fa-2x mb-2"></i>
+                                <span>Store Settings</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Orders -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Recent Orders</h5>
+                    <a href="{{ url_for('seller.orders') }}" class="btn btn-sm btn-outline-light">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if recent_orders %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Date</th>
+                                    <th>Customer</th>
+                                    <th>Items</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in recent_orders %}
+                                <tr>
+                                    <td>#{{ order.id }}</td>
+                                    <td>{{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    <td>{{ order.username }}</td>
+                                    <td>{{ order.items|length }}</td>
+                                    <td>
+                                        {% set total = 0 %}
+                                        {% for item in order.items %}
+                                            {% set total = total + item.subtotal %}
+                                        {% endfor %}
+                                        ${{ "%.2f"|format(total) }}
+                                    </td>
+                                    <td>
+                                        {% if order.order_status == 'pending' %}
+                                        <span class="badge bg-warning">Pending</span>
+                                        {% elif order.order_status == 'processing' %}
+                                        <span class="badge bg-info">Processing</span>
+                                        {% elif order.order_status == 'shipped' %}
+                                        <span class="badge bg-primary">Shipped</span>
+                                        {% elif order.order_status == 'delivered' %}
+                                        <span class="badge bg-success">Delivered</span>
+                                        {% elif order.order_status == 'cancelled' %}
+                                        <span class="badge bg-danger">Cancelled</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('seller.order_detail', order_id=order.id) }}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+                        <h5>No Orders Yet</h5>
+                        <p>You haven't received any orders yet.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

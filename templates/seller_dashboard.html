@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block title %}Storefront - Seller Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Seller Dashboard</h1>
+    <div>
+        <a href="{{ url_for('edit_store') }}" class="btn btn-secondary me-2">Edit Store</a>
+        <a href="{{ url_for('add_item') }}" class="btn btn-primary">Add New Item</a>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h3>Store Information</h3>
+            </div>
+            <div class="card-body">
+                <h4>{{ seller.store_name }}</h4>
+                <p>{{ seller.description }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3>Your Products</h3>
+                <a href="{{ url_for('add_item') }}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-plus me-1"></i>Add New Item
+                </a>
+            </div>
+            <div class="card-body">
+                {% if items %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Name</th>
+                                <th>Price</th>
+                                <th>Stock</th>
+                                <th>Rating</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                            <tr>
+                                <td>
+                                    {% if item.image_url %}
+                                    <img src="{{ item.image_url }}" alt="{{ item.name }}" style="width: 50px; height: 50px; object-fit: cover;">
+                                    {% else %}
+                                    <img src="https://via.placeholder.com/50" alt="Placeholder">
+                                    {% endif %}
+                                </td>
+                                <td>{{ item.name }}</td>
+                                <td>${{ "%.2f"|format(item.price) }}</td>
+                                <td>{{ item.stock }}</td>
+                                <td>
+                                    <span class="star-rating">
+                                        {% for i in range(5) %}
+                                            {% if i < item.avg_rating|int %}
+                                                <i class="fas fa-star"></i>
+                                            {% elif i < item.avg_rating|float %}
+                                                <i class="fas fa-star-half-alt"></i>
+                                            {% else %}
+                                                <i class="far fa-star"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </span>
+                                    <small class="text-muted">({{ item.review_count }})</small>
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="{{ url_for('item_detail', item_id=item.id) }}" class="btn btn-sm btn-info">View</a>
+                                        <a href="{{ url_for('edit_item', item_id=item.id) }}" class="btn btn-sm btn-primary">Edit</a>
+                                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ item.id }}">Delete</button>
+                                    </div>
+                                    
+                                    <!-- Delete Modal -->
+                                    <div class="modal fade" id="deleteModal{{ item.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ item.id }}" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="deleteModalLabel{{ item.id }}">Confirm Delete</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    Are you sure you want to delete <strong>{{ item.name }}</strong>? This action cannot be undone.
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                    <form action="{{ url_for('delete_item', item_id=item.id) }}" method="POST">
+                                                        <button type="submit" class="btn btn-danger">Delete</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">You haven't added any products yet. <a href="{{ url_for('add_item') }}">Add your first product</a>.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3>Recent Orders</h3>
+                <a href="{{ url_for('seller_orders') }}" class="btn btn-sm btn-secondary">View All Orders</a>
+            </div>
+            <div class="card-body">
+                {% if recent_orders %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer</th>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in recent_orders %}
+                            <tr>
+                                <td>#{{ order.id }}</td>
+                                <td>{{ order.username }}</td>
+                                <td>{{ order.item_name }}</td>
+                                <td>{{ order.quantity }}</td>
+                                <td>{{ order.created_at.strftime('%Y-%m-%d') }}</td>
+                                <td>
+                                    {% if order.status == 'pending' %}
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                    {% elif order.status == 'processing' %}
+                                    <span class="badge bg-info text-dark">Processing</span>
+                                    {% elif order.status == 'shipped' %}
+                                    <span class="badge bg-primary">Shipped</span>
+                                    {% elif order.status == 'delivered' %}
+                                    <span class="badge bg-success">Delivered</span>
+                                    {% elif order.status == 'cancelled' %}
+                                    <span class="badge bg-danger">Cancelled</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('seller_order_details', order_id=order.id) }}" class="btn btn-sm btn-primary">View</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">No orders yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

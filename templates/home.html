@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero bg-light py-5 text-center">
+    <div class="container">
+        <h1>Welcome to Sellix</h1>
+        <p class="lead">Discover thousands of products from sellers around the world</p>
+        <div class="mt-4">
+            <a href="{{ url_for('market.market') }}" class="btn btn-primary btn-lg">Start Shopping</a>
+            {% if not user %}
+            <a href="{{ url_for('auth.register') }}" class="btn btn-outline-primary btn-lg ms-2">Join Us</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Categories Section -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="mb-4">Category</h2>
+        <div class="row">
+            {% for category in categories %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">{{ category.name }}</h5>
+                        <p class="card-text">{{ category.description|truncate(100) }}</p>
+                        <a href="{{ url_for('market.market', category=category.id) }}" class="btn btn-outline-primary">Browse</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Featured Products Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="mb-4">Featured Products</h2>
+        <div class="row">
+            {% for product in products %}
+            <div class="col-md-3 mb-4">
+                <div class="card h-100">
+                    {% if product.primary_image %}
+                    <img src="{{ product.primary_image }}" class="card-img-top" alt="{{ product.name }}" style="height: 200px; object-fit: cover;">
+                    {% else %}
+                    <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <span class="text-white">No Image</span>
+                    </div>
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text text-truncate">{{ product.description }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            {% if product.discount_price %}
+                            <div>
+                                <span class="text-decoration-line-through text-muted">${{ "%.2f"|format(product.price) }}</span>
+                                <span class="text-danger">${{ "%.2f"|format(product.discount_price) }}</span>
+                            </div>
+                            {% else %}
+                            <span>${{ "%.2f"|format(product.price) }}</span>
+                            {% endif %}
+                            <a href="{{ url_for('market.product_detail', product_id=product.id) }}" class="btn btn-sm btn-primary">View</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-4">
+            <a href="{{ url_for('market.market') }}" class="btn btn-outline-primary">View All Products</a>
+        </div>
+    </div>
+</section>
+
+<!-- Become a Seller Section -->
+{% endblock %}

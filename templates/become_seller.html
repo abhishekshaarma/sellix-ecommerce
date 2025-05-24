@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Become a Seller</h4>
+            </div>
+            <div class="card-body">
+                <p class="lead mb-4">Join thousands of sellers on our platform and start selling your products today!</p>
+                
+                <form method="POST" action="{{ url_for('auth.process_become_seller') }}">
+                    <div class="mb-3">
+                        <label for="shop_name" class="form-label">Shop Name</label>
+                        <input type="text" class="form-control" id="shop_name" name="shop_name" required>
+                        <div class="form-text">Choose a unique name for your shop.</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="shop_description" class="form-label">Shop Description</label>
+                        <textarea class="form-control" id="shop_description" name="shop_description" rows="4"></textarea>
+                        <div class="form-text">Describe what your shop is all about.</div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Create My Shop</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

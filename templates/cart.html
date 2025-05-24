@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Shopping Cart</h2>
+
+    {% if cart["items"] %}
+        <ul class="list-group mb-4">
+            {% for item in cart["items"] %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>{{ item.name }}</strong><br>
+                    Quantity: {{ item.quantity }}<br>
+                    Price: ${{ "%.2f"|format(item.price) }}
+                </div>
+                <div>
+                    Total: ${{ "%.2f"|format(item.price * item.quantity) }}<br>
+                    <a href="{{ url_for('market.product_detail', product_id=item.product_id) }}" class="btn btn-sm btn-outline-primary mt-1">View</a>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+
+        <div class="mb-3">
+            <h4>Total: ${{ "%.2f"|format(cart.total) }}</h4>
+        </div>
+
+        {% if user %}
+            <a href="{{ url_for('market.checkout') }}" class="btn btn-success">Proceed to Checkout</a>
+        {% else %}
+            <a href="{{ url_for('auth.login') }}?next={{ url_for('market.checkout') }}" class="btn btn-primary">Login to Checkout</a>
+        {% endif %}
+
+    {% else %}
+        <p>Your cart is empty.</p>
+        <a href="{{ url_for('market.market') }}" class="btn btn-outline-primary">Back to Market</a>
+    {% endif %}
+</div>
+{% endblock %}

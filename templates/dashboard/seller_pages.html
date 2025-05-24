@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">Manage Store Pages</h1>
+        <a href="{{ url_for('seller.add_page') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add New Page
+        </a>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Custom Pages</h6>
+        </div>
+        <div class="card-body">
+            {% if pages %}
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="pagesTable" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Slug</th>
+                                <th>Created</th>
+                                <th>Last Updated</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for page in pages %}
+                                <tr>
+                                    <td>{{ page.title }}</td>
+                                    <td><code>{{ page.slug }}</code></td>
+                                    <td>{{ page.created_at.strftime('%Y-%m-%d') }}</td>
+                                    <td>{{ page.updated_at.strftime('%Y-%m-%d') }}</td>
+                                    <td>
+                                        {% if page.is_active %}
+                                            <span class="badge bg-success">Published</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Draft</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ url_for('seller.edit_page', page_id=page.id) }}" class="btn btn-sm btn-primary">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            
+                                            {% if page.is_active %}
+                                            <a href="{{ url_for('seller.shop_page', seller_id=seller.id, slug=page.slug) }}" class="btn btn-sm btn-info" target="_blank">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            
+                                            <form action="{{ url_for('seller.toggle_publish', page_id=page.id) }}" method="POST" class="d-inline">
+                                                <button type="submit" class="btn btn-sm btn-warning">
+                                                    <i class="fas fa-eye-slash"></i>
+                                                </button>
+                                            </form>
+                                            {% else %}
+                                            <form action="{{ url_for('seller.toggle_publish', page_id=page.id) }}" method="POST" class="d-inline">
+                                                <button type="submit" class="btn btn-sm btn-success">
+                                                    <i class="fas fa-eye"></i> Publish
+                                                </button>
+                                            </form>
+                                            {% endif %}
+                                            
+                                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ page.id }}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+
+                                        <!-- Delete Modal -->
+                                        <div class="modal fade" id="deleteModal{{ page.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ page.id }}" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="deleteModalLabel{{ page.id }}">Confirm Delete</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        Are you sure you want to delete the page "<strong>{{ page.title }}</strong>"? This action cannot be undone.
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                        <form action="{{ url_for('seller.delete_page', page_id=page.id) }}" method="POST">
+                                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-file-alt fa-4x mb-3 text-muted"></i>
+                    <h5>No Custom Pages Yet</h5>
+                    <p class="text-muted">Create custom pages for your store such as About Us, Shipping Policy, FAQ, etc.</p>
+                    <a href="{{ url_for('seller.add_page') }}" class="btn btn-primary mt-3">
+                        <i class="fas fa-plus"></i> Add Your First Page
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Page Tips</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-info-circle text-primary me-2"></i>About Us</h5>
+                            <p class="card-text">Share your store's story, mission, and vision. Let customers know who you are and why you started your business.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-shipping-fast text-primary me-2"></i>Shipping Policy</h5>
+                            <p class="card-text">Explain your shipping methods, costs, delivery times, and any international shipping options you offer.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-exchange-alt text-primary me-2"></i>Return Policy</h5>
+                            <p class="card-text">Outline your return and refund process, including timeframes, conditions, and how to initiate a return.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if pages %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        $('#pagesTable').DataTable({
+            order: [[2, 'desc']], // Sort by created date descending
+            pageLength: 10
+        });
+    });
+</script>
+{% endif %}
+{% endblock %}

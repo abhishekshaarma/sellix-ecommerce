@@ -1,0 +1,18 @@
+{% extends 'store_base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ product.name }}</h2>
+    <p><strong>Price:</strong> ${{ product.price }}</p>
+    <p><strong>Discount:</strong> ${{ product.discount_price }}</p>
+    <p><strong>Stock:</strong> {{ product.stock_quantity }}</p>
+    <p><strong>Category:</strong> {{ category.name }}</p>
+    <p><strong>Seller:</strong> {{ seller.shop_name }}</p>
+
+    <a href="{{ url_for('admin.edit_product', product_id=product.id) }}" class="btn btn-primary">Edit Product</a>
+
+    <form method="POST" action="{{ url_for('admin.delete_product', product_id=product.id) }}" class="d-inline">
+        <button type="submit" class="btn btn-danger">Delete</button>
+    </form>
+</div>
+{% endblock %}

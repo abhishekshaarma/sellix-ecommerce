@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Storefront - Order #{{ order.id }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Order #{{ order.id }}</h1>
+    <a href="{{ url_for('orders') }}" class="btn btn-secondary">Back to Orders</a>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h4>Order Items</h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in order_items %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        {% if item.image_url %}
+                                        <img src="{{ item.image_url }}" alt="{{ item.name }}" class="me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                        {% else %}
+                                        <img src="https://via.placeholder.com/50" alt="Placeholder" class="me-3">
+                                        {% endif %}
+                                        <a href="{{ url_for('item_detail', item_id=item.item_id) }}">{{ item.name }}</a>
+                                    </div>
+                                </td>
+                                <td>${{ "%.2f"|format(item.price_at_time) }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>${{ "%.2f"|format(item.price_at_time * item.quantity) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                                <td><strong>${{ "%.2f"|format(order.total_price) }}</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h4>Order Details</h4>
+            </div>
+            <div class="card-body">
+                <p><strong>Order Date:</strong> {{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                <p>
+                    <strong>Status:</strong>
+                    {% if order.status == 'pending' %}
+                    <span class="badge bg-warning text-dark">Pending</span>
+                    {% elif order.status == 'processing' %}
+                    <span class="badge bg-info text-dark">Processing</span>
+                    {% elif order.status == 'shipped' %}
+                    <span class="badge bg-primary">Shipped</span>
+                    {% elif order.status == 'delivered' %}
+                    <span class="badge bg-success">Delivered</span>
+                    {% elif order.status == 'cancelled' %}
+                    <span class="badge bg-danger">Cancelled</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

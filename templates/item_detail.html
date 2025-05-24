@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Storefront - {{ item.name }}{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-5">
+        {% if item.image_url %}
+        <img src="{{ item.image_url }}" class="img-fluid rounded" alt="{{ item.name }}">
+        {% else %}
+        <img src="https://via.placeholder.com/600x400" class="img-fluid rounded" alt="Placeholder">
+        {% endif %}
+    </div>
+    <div class="col-md-7">
+        <h1>{{ item.name }}</h1>
+        <div class="mb-3">
+            <span class="star-rating">
+                {% for i in range(5) %}
+                    {% if i < item.avg_rating|int %}
+                        <i class="fas fa-star"></i>
+                    {% elif i < item.avg_rating|float %}
+                        <i class="fas fa-star-half-alt"></i>
+                    {% else %}
+                        <i class="far fa-star"></i>
+                    {% endif %}
+                {% endfor %}
+            </span>
+            <span class="text-muted">({{ item.review_count }} reviews)</span>
+        </div>
+        <p class="lead">${{ "%.2f"|format(item.price) }}</p>
+        <p>{{ item.description }}</p>
+        <p>
+            <strong>Seller:</strong> {{ item.store_name }}
+        </p>
+        <p>
+            {% if item.stock > 0 %}
+            <span class="badge bg-success">In Stock ({{ item.stock }})</span>
+            {% else %}
+            <span class="badge bg-danger">Out of Stock</span>
+            {% endif %}
+        </p>
+        {% if current_user.is_authenticated and item.stock > 0 %}
+        <a href="{{ url_for('add_to_cart', item_id=item.id) }}" class="btn btn-primary btn-lg">
+            <i class="fas fa-shopping-cart me-2"></i>Add to Cart
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h3>Reviews</h3>
+            </div>
+            <div class="card-body">
+                {% if current_user.is_authenticated and not has_reviewed and current_user.id != item.seller_user_id %}
+                <div class="mb-4">
+                    <h5>Write a Review</h5>
+                    <form method="POST" action="{{ url_for('item_detail', item_id=item.id) }}">
+                        {{ form.hidden_tag() }}
+                        <div class="mb-3">
+                            {{ form.rating.label(class="form-label") }}
+                            {{ form.rating(class="form-select") }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.comment.label(class="form-label") }}
+                            {{ form.comment(class="form-control", rows=3) }}
+                        </div>
+                        {{ form.submit(class="btn btn-primary") }}
+                    </form>
+                </div>
+                <hr>
+                {% endif %}
+
+                {% if reviews %}
+                {% for review in reviews %}
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5>{{ review.username }}</h5>
+                            <span class="star-rating">
+                                {% for i in range(5) %}
+                                    {% if i < review.rating %}
+                                        <i class="fas fa-star"></i>
+                                    {% else %}
+                                        <i class="far fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </span>
+                        </div>
+                        <small class="text-muted">{{ review.created_at.strftime('%Y-%m-%d') }}</small>
+                    </div>
+                    <p>{{ review.comment }}</p>
+                    {% if not loop.last %}
+                    <hr>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                {% else %}
+                <p class="text-muted">No reviews yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

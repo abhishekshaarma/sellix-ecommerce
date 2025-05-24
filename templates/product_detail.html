@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-5">
+        <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                {% for image in product.images %}
+                <div class="carousel-item {% if loop.first %}active{% endif %}">
+                    <img src="{{ image.image_url }}" class="d-block w-100" alt="{{ product.name }}">
+                </div>
+                {% else %}
+                <div class="carousel-item active">
+                    <div class="bg-secondary d-flex justify-content-center align-items-center" style="height: 300px;">
+                        <span class="text-white">No Image</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-7">
+        <h1>{{ product.name }}</h1>
+        <h3>${{ product.price }}</h3>
+
+        <form method="POST" action="{{ url_for('market.add_to_cart') }}">
+            <input type="hidden" name="product_id" value="{{ product.id }}">
+            <button type="submit" class="btn btn-primary">Add to Cart</button>
+        </form>
+    </div>
+</div>
+
+<div class="mt-4">
+    <h4>Description</h4>
+    <p>{{ product.description|replace('\n', '<br>')|safe }}</p>
+</div>
+
+<div class="mt-4">
+    <h4>Reviews</h4>
+    {% for review in product.reviews %}
+    <div class="mb-3">
+        <strong>{{ review.username }}</strong> - {{ review.created_at.strftime('%B %d, %Y') }}
+        <p>{{ review.comment|replace('\n', '<br>')|safe }}</p>
+    </div>
+    {% else %}
+    <p>No reviews yet</p>
+    {% endfor %}
+</div>
+{% endblock %}

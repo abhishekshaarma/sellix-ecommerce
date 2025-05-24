@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">Verify Your Email</div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <p>A verification code has been sent to <strong>{{ user.email }}</strong>.</p>
+                        <p>Please check your inbox and enter the 6-digit code below.</p>
+                    </div>
+                    
+                    <form method="POST" action="{{ url_for('auth.verify_account') }}">
+                        <div class="mb-3">
+                            <label for="otp" class="form-label">Verification Code</label>
+                            <input type="text" class="form-control" id="otp" name="otp" placeholder="Enter 6-digit code" required>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Verify Account</button>
+                        </div>
+                    </form>
+                    
+                    <div class="mt-3 text-center">
+                        <p>Didn't receive the code? <a href="{{ url_for('auth.resend_otp') }}">Resend Code</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">{{ 'Edit' if page else 'Add New' }} Page</h1>
+        <a href="{{ url_for('seller.pages') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Pages
+        </a>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">{{ 'Edit' if page else 'Create' }} Store Page</h6>
+        </div>
+        <div class="card-body">
+            <form method="POST" enctype="multipart/form-data">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="title" class="form-label">Page Title <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="title" name="title" value="{{ page.title if page else '' }}" required>
+                        <div class="form-text">This appears as the title of your page.</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="slug" class="form-label">Page URL Slug <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text">/pages/</span>
+                            <input type="text" class="form-control" id="slug" name="slug" value="{{ page.slug if page else '' }}" required>
+                        </div>
+                        <div class="form-text">Use lowercase letters, numbers, and hyphens only. No spaces.</div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="content" class="form-label">Page Content <span class="text-danger">*</span></label>
+                    <textarea class="form-control" id="content" name="content" rows="15" required>{{ page.content if page else '' }}</textarea>
+                    <div class="form-text">You can use HTML tags for formatting.</div>
+                </div>
+
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="is_active" name="is_active" {% if page and page.is_active %}checked{% endif %}>
+                    <label class="form-check-label" for="is_active">
+                        Publish this page (make it visible to customers)
+                    </label>
+                </div>
+
+                <hr>
+
+                <div class="d-flex justify-content-between">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> {{ 'Update' if page else 'Create' }} Page
+                    </button>
+                    {% if page %}
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                        <i class="fas fa-trash"></i> Delete Page
+                    </button>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">HTML Formatting Tips</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Basic Text Formatting</h5>
+                    <ul class="list-unstyled">
+                        <li><code>&lt;h1&gt;Main Heading&lt;/h1&gt;</code> - Main Heading</li>
+                        <li><code>&lt;h2&gt;Subheading&lt;/h2&gt;</code> - Subheading</li>
+                        <li><code>&lt;p&gt;Paragraph text&lt;/p&gt;</code> - Paragraph</li>
+                        <li><code>&lt;strong&gt;Bold text&lt;/strong&gt;</code> - <strong>Bold text</strong></li>
+                        <li><code>&lt;em&gt;Italic text&lt;/em&gt;</code> - <em>Italic text</em></li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h5>Advanced Elements</h5>
+                    <ul class="list-unstyled">
+                        <li><code>&lt;ul&gt;&lt;li&gt;List item&lt;/li&gt;&lt;/ul&gt;</code> - Bulleted list</li>
+                        <li><code>&lt;ol&gt;&lt;li&gt;List item&lt;/li&gt;&lt;/ol&gt;</code> - Numbered list</li>
+                        <li><code>&lt;a href="URL"&gt;Link text&lt;/a&gt;</code> - Hyperlink</li>
+                        <li><code>&lt;img src="URL" alt="Description"&gt;</code> - Image</li>
+                        <li><code>&lt;blockquote&gt;Quote text&lt;/blockquote&gt;</code> - Indented quote</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if page %}
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete the page "<strong>{{ page.title }}</strong>"? This action cannot be undone.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form action="{{ url_for('seller.delete_page', page_id=page.id) }}" method="POST">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Auto-generate slug from title
+        const titleInput = document.getElementById('title');
+        const slugInput = document.getElementById('slug');
+        
+        if (titleInput && slugInput) {
+            titleInput.addEventListener('input', function() {
+                // Only auto-generate if slug is empty or hasn't been manually edited
+                if (!slugInput.dataset.edited) {
+                    const slug = this.value
+                        .toLowerCase()
+                        .replace(/[^\w\s-]/g, '') // Remove special chars
+                        .replace(/\s+/g, '-')     // Replace spaces with hyphens
+                        .replace(/-+/g, '-');     // Remove consecutive hyphens
+                    
+                    slugInput.value = slug;
+                }
+            });
+            
+            // Mark slug as edited when user changes it manually
+            slugInput.addEventListener('input', function() {
+                this.dataset.edited = 'true';
+            });
+        }
+        
+        // Initialize WYSIWYG editor if available
+        if (typeof ClassicEditor !== 'undefined') {
+            ClassicEditor
+                .create(document.querySelector('#content'))
+                .catch(error => {
+                    console.error(error);
+                });
+        }
+    });
+</script>
+{% endblock %}

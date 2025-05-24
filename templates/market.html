@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <!-- Sidebar -->
+    <div class="col-md-3 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Categories</h5>
+            </div>
+            <div class="list-group list-group-flush">
+                <a href="{{ url_for('market.market') }}" class="list-group-item list-group-item-action {% if not category_id %}active{% endif %}">
+                    All Categories
+                </a>
+                {% for category in categories %}
+                <a href="{{ url_for('market.market', category=category.id) }}" class="list-group-item list-group-item-action {% if category_id == category.id %}active{% endif %}">
+                    {{ category.name }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Filter Card -->
+        <div class="card mt-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Filter</h5>
+            </div>
+            <div class="card-body">
+                <form method="GET" action="{{ url_for('market.market') }}">
+                    {% if category_id %}
+                    <input type="hidden" name="category" value="{{ category_id }}">
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        <label for="search" class="form-label">Search</label>
+                        <input type="text" class="form-control" id="search" name="search" value="{{ search if search else '' }}">
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Apply Filters</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Products -->
+    <div class="col-md-9">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                {% if category_name %}
+                {{ category_name }} Products
+                {% elif search %}
+                Search Results for "{{ search }}"
+                {% else %}
+                All Products
+                {% endif %}
+            </h2>
+            
+            <!-- Sort Dropdown -->
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    Sort By
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="sortDropdown">
+                    <li><a class="dropdown-item" href="#">Latest</a></li>
+                    <li><a class="dropdown-item" href="#">Price: Low to High</a></li>
+                    <li><a class="dropdown-item" href="#">Price: High to Low</a></li>
+                    <li><a class="dropdown-item" href="#">Popularity</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        {% if products %}
+        <div class="row">
+            {% for product in products %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    {% if product.primary_image %}
+                    <img src="{{ product.primary_image }}" class="card-img-top" alt="{{ product.name }}" style="height: 200px; object-fit: cover;">
+                    {% else %}
+                    <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <span class="text-white">No Image</span>
+                    </div>
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text text-truncate">{{ product.description }}</p>
+                        <div class="mb-2">
+                            <small class="text-muted">
+                                {{ product.category_name if product.category_name else 'Uncategorized' }} | 
+                                Seller: {{ product.shop_name }}
+                            </small>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            {% if product.discount_price %}
+                            <div>
+                                <span class="text-decoration-line-through text-muted">${{ "%.2f"|format(product.price) }}</span>
+                                <span class="text-danger">${{ "%.2f"|format(product.discount_price) }}</span>
+                            </div>
+                            {% else %}
+                            <span>${{ "%.2f"|format(product.price) }}</span>
+                            {% endif %}
+                            <a href="{{ url_for('market.product_detail', product_id=product.id) }}" class="btn btn-sm btn-primary">View</a>
+                        </div>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            {% if product.avg_rating %}
+                            <div class="d-inline-block me-1">
+                                {% for i in range(5) %}
+                                    {% if i < product.avg_rating|int %}
+                                    <i class="fas fa-star text-warning"></i>
+                                    {% elif i < product.avg_rating %}
+                                    <i class="fas fa-star-half-alt text-warning"></i>
+                                    {% else %}
+                                    <i class="far fa-star text-warning"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <span>{{ "%.1f"|format(product.avg_rating) }}</span>
+                            {% else %}
+                            <span>No ratings</span>
+                            {% endif %}
+                        </small>
+                        {% if user %}
+                        <form method="POST" action="{{ url_for('market.add_to_cart') }}">
+                            <input type="hidden" name="product_id" value="{{ product.id }}">
+                            <button type="submit" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-cart-plus"></i>
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Pagination -->
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                <li class="page-item {% if page == 1 %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('market.market', page=page-1, category=category_id, search=search) }}">Previous</a>
+                </li>
+                <!-- Page numbers would be dynamically generated based on total pages -->
+                <li class="page-item active">
+                    <span class="page-link">{{ page }}</span>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('market.market', page=page+1, category=category_id, search=search) }}">Next</a>
+                </li>
+            </ul>
+        </nav>
+        {% else %}
+        <div class="alert alert-info">
+            <h4 class="alert-heading">No products found!</h4>
+            <p>
+                {% if search %}
+                No products match your search "{{ search }}".
+                {% elif category_name %}
+                No products found in the {{ category_name }} category.
+                {% else %}
+                No products are available at this time.
+                {% endif %}
+            </p>
+            {% if search or category_id %}
+            <hr>
+            <p class="mb-0">
+                <a href="{{ url_for('market.market') }}" class="alert-link">View all products</a>
+            </p>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

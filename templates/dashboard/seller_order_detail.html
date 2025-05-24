@@ -1,0 +1,48 @@
+{% extends 'store_base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Order #{{ order.id }} Details</h2>
+    
+    <p><strong>Status:</strong> {{ order.status }}</p>
+    <p><strong>Payment:</strong> {{ order.payment_status }}</p>
+    <p><strong>Created:</strong> {{ order.created_at }}</p>
+
+    <hr>
+    <h4>Items in this Order</h4>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order.items %}
+            {% if item.seller_id == seller.id %}
+            <tr>
+                <td>{{ item.product_name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>${{ item.subtotal }}</td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <form method="POST" action="{{ url_for('seller.update_order_status') }}">
+        <input type="hidden" name="order_id" value="{{ order.id }}">
+        <div class="form-group">
+            <label for="status">Update Status</label>
+            <select name="status" class="form-control" required>
+                <option value="">-- Select Status --</option>
+                <option value="Processing">Processing</option>
+                <option value="Shipped">Shipped</option>
+                <option value="Delivered">Delivered</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary mt-2">Update</button>
+    </form>
+</div>
+{% endblock %}
