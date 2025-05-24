@@ -123,7 +123,7 @@ sellix-ecommerce/
 │   └── pages_route.py    # Custom page routes
 ├── static/
 │   └── uploads/          # File upload directory
-└── templates/            # HTML templates (not included)
+└── templates/            
 ```
 
 ## 🗄️ Database Schema
